@@ -8,16 +8,17 @@ When you like to search sphinx generated indexes from a zf2 application, use thi
 
 Installation
 ------------
+
 1. Preparation
 
-    Make sure you have a working Sphinx server anywhere.
+    Make sure you have a working Sphinx server anywhere
 
 2. Require SphinxSearch
 
     From within your project execute the following:
 
-```bash
-    php composer.phar require bboer/sphinxsearch
+```
+php composer.phar require bboer/sphinxsearch
 ```
 
 3. Configure SphinxSearch
@@ -25,6 +26,7 @@ Installation
     copy sphinxsearch.local.php.dist to your /config/autoload/sphinxsearch.local.php
 
     Sample configuration:
+
 ```php
 <?php
 return array(
@@ -40,7 +42,9 @@ return array(
 
 Usage
 -----
+
 1. Using the Search service using the ServiceTrait
+
 ```php
 <?php
 namespace MyModule\MySpace;
@@ -68,6 +72,7 @@ class MyService implements ServiceLocatorAwareInterface
 ```
 
 2. Using the Search service by locating it through the ServiceLocator
+
 ```php
 <?php
 namespace MyModule\MySpace;
