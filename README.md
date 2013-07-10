@@ -17,9 +17,9 @@ Installation
 
     From within your project execute the following:
 
-```
-php composer.phar require bboer/sphinxsearch
-```
+    ```
+    php composer.phar require bboer/sphinxsearch
+    ```
 
 3. Configure SphinxSearch
 
@@ -27,78 +27,78 @@ php composer.phar require bboer/sphinxsearch
 
     Sample configuration:
 
-```php
-<?php
-return array(
-    'sphinx_search' => array(
-        'server' => array(
-            'host' => 'mysphinxhost.com',
-            'port' => 9312,
+    ```php
+    <?php
+    return array(
+        'sphinx_search' => array(
+            'server' => array(
+                'host' => 'mysphinxhost.com',
+                'port' => 9312,
+            ),
         ),
-    ),
-);
-
-```
+    );
+    
+    ```
 
 Usage
 -----
 
 1. Using the Search service using the ServiceTrait
 
-```php
-<?php
-namespace MyModule\MySpace;
-
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-
-class MyService implements ServiceLocatorAwareInterface
-{
-    use \SphinxSearch\ServiceManager\ServiceTrait;
-
-    public function myServiceMethod()
+    ```php
+    <?php
+    namespace MyModule\MySpace;
+    
+    use Zend\ServiceManager\ServiceLocatorAwareInterface;
+    
+    class MyService implements ServiceLocatorAwareInterface
     {
-        // Get the results from the SphinxSearch service
-        $results = $this->getSphinxSearchService()->search(
-            'person_main',
-            $filters,
-            $queries,
-            $fieldWeights,
-            $limit,
-            $offset
-        );
-        // NOTE: Used variables are not defined and intended as an example
+        use \SphinxSearch\ServiceManager\ServiceTrait;
+    
+        public function myServiceMethod()
+        {
+            // Get the results from the SphinxSearch service
+            $results = $this->getSphinxSearchService()->search(
+                'person_main',
+                $filters,
+                $queries,
+                $fieldWeights,
+                $limit,
+                $offset
+            );
+            // NOTE: Used variables are not defined and intended as an example
+        }
     }
-}
-```
+    ```
 
 2. Using the Search service by locating it through the ServiceLocator
 
-```php
-<?php
-namespace MyModule\MySpace;
-
-use Zend\ServiceManager\ServiceLocatorAwareInterface;
-
-class MyService implements ServiceLocatorAwareInterface
-{
-    use \SphinxSearch\ServiceManager\ServiceTrait;
-
-    public function myServiceMethod()
+    ```php
+    <?php
+    namespace MyModule\MySpace;
+    
+    use Zend\ServiceManager\ServiceLocatorAwareInterface;
+    
+    class MyService implements ServiceLocatorAwareInterface
     {
-        // Get the SphinxSearch Search service
-        $searchService = $this->getServiceLocator()->get(
-            'SphinxSearch\Search\Search'
-        );
-        // Get the results from the SphinxSearch service
-        $results = $searchService->search(
-            'person_main',
-            $filters,
-            $queries,
-            $fieldWeights,
-            $limit,
-            $offset
-        );
-        // NOTE: Used variables are not defined and intended as an example
+        use \SphinxSearch\ServiceManager\ServiceTrait;
+    
+        public function myServiceMethod()
+        {
+            // Get the SphinxSearch Search service
+            $searchService = $this->getServiceLocator()->get(
+                'SphinxSearch\Search\Search'
+            );
+            // Get the results from the SphinxSearch service
+            $results = $searchService->search(
+                'person_main',
+                $filters,
+                $queries,
+                $fieldWeights,
+                $limit,
+                $offset
+            );
+            // NOTE: Used variables are not defined and intended as an example
+        }
     }
-}
-```
+    ```
