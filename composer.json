@@ -1,11 +1,11 @@
 {
-    "name"              : "ratus/sphinxsearch",
+    "name"              : "bboer/sphinxsearch",
     "description"       : "Search any sphinx index",
 	"minimum-stability" : "dev",
     "keywords": [
-        "ratus",
-        "notify",
-        "events"
+        "sphinx",
+        "index",
+        "search"
     ],
 	"authors": [
         {
@@ -14,9 +14,8 @@
         }
     ],
     "require": {
-        "php"                         : ">=5.4",
-        "zendframework/zendframework" : "2.*",
-        "ratus/zend-additionals"      : "dev-master"
+        "php"                         : ">=5.3",
+        "zendframework/zendframework" : "2.*"
     },
     "autoload" : {
         "psr-0": {

@@ -10,8 +10,6 @@ use SphinxSearch\SphinxClient\Exception;
  */
 class SphinxClientServiceFactory implements FactoryInterface
 {
-    use \ZendAdditionals\Config\ConfigExtensionTrait;
-
     /**
      * @param ServiceLocatorInterface $serviceLocator
      *
@@ -32,6 +30,14 @@ class SphinxClientServiceFactory implements FactoryInterface
     }
 
     /**
+     * @return array
+     */
+    public function getConfig()
+    {
+        return $this->getServiceLocator()->get('Config');
+    }
+
+    /**
      * Creates the SphinxClient service
      *
      * @param  ServiceLocatorInterface $serviceLocator
@@ -43,8 +49,19 @@ class SphinxClientServiceFactory implements FactoryInterface
         $this->setServiceLocator($serviceLocator);
         require_once __DIR__ . DIRECTORY_SEPARATOR . 'SphinxClient.php';
 
-        $host = $this->getConfigItem('sphinx_search.server.host');
-        $port = $this->getConfigItem('sphinx_search.server.port');
+        $config = $this->getConfig();
+
+        $host = (
+            isset($config['sphinx_search']['server']['host']) ?
+            $config['sphinx_search']['server']['host'] :
+            null
+        );
+
+        $port = (
+            isset($config['sphinx_search']['server']['port']) ?
+            $config['sphinx_search']['server']['port'] :
+            null
+        );
 
         if (null === $host || null === $port) {
             throw new Exception\SphinxConnectionFailedException(
@@ -59,7 +76,6 @@ class SphinxClientServiceFactory implements FactoryInterface
         $sphinxClient->SetMatchMode(SPH_MATCH_EXTENDED2);
         $sphinxClient->SetSortMode(SPH_SORT_RELEVANCE);
         $sphinxClient->SetRankingMode(SPH_RANK_PROXIMITY);
-
 
         return $sphinxClient;
     }
