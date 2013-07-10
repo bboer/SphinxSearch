@@ -1,0 +1,29 @@
+{
+    "name"              : "ratus/sphinxsearch",
+    "description"       : "Search any sphinx index",
+	"minimum-stability" : "dev",
+    "keywords": [
+        "ratus",
+        "notify",
+        "events"
+    ],
+	"authors": [
+        {
+            "name"  : "Bart de Boer",
+            "email" : "bart@ratus.nl"
+        }
+    ],
+    "require": {
+        "php"                         : ">=5.4",
+        "zendframework/zendframework" : "2.*",
+        "ratus/zend-additionals"      : "dev-master"
+    },
+    "autoload" : {
+        "psr-0": {
+            "SphinxSearch": "library/"
+        },
+        "classmap": [
+            "./"
+        ]
+    }
+}

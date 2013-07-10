@@ -1,0 +1,9 @@
+<?php
+return array(
+    'sphinx_search' => array(
+        'server' => array(
+            'host' => 'localhost',
+            'port' => 1234,
+        ),
+    ),
+);
