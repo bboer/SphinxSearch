@@ -1,4 +1,6 @@
 <?php
+namespace SphinxSearch\SphinxClient;
+
 //
 // Copyright (c) 2001-2011, Andrew Aksyonoff
 // Copyright (c) 2008-2011, Sphinx Technologies Inc

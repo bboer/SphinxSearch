@@ -47,7 +47,6 @@ class SphinxClientServiceFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
         $this->setServiceLocator($serviceLocator);
-        require_once __DIR__ . DIRECTORY_SEPARATOR . 'SphinxClient.php';
 
         $config = $this->getConfig();
 
@@ -69,7 +68,7 @@ class SphinxClientServiceFactory implements FactoryInterface
             );
         }
 
-        $sphinxClient = new \SphinxClient();
+        $sphinxClient = new SphinxClient();
         $sphinxClient->SetServer($host, $port);
         $sphinxClient->SetConnectTimeout(1);
         $sphinxClient->SetArrayResult(true);
