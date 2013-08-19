@@ -53,6 +53,11 @@ class Search implements ServiceLocatorAwareInterface
      *     'field_two' => 3,
      *     ...
      * );
+     * @param array   $sortBy Provide sort info like:
+     * array(
+     *     'mode'  => SPH_SORT_ATTR_DESC,
+     *     'field' => 'profile_created',
+     * ),
      * @param integer $limit
      * @param integer $offset
      *
@@ -78,6 +83,7 @@ class Search implements ServiceLocatorAwareInterface
         array $filters      = null,
         array $queries      = null,
         array $fieldWeights = null,
+        array $sortBy       = null,
               $limit        = 20,
               $offset       = 0
     ) {
@@ -148,6 +154,11 @@ class Search implements ServiceLocatorAwareInterface
 
         if (null !== $fieldWeights) {
             $sphinxClient->SetFieldWeights($fieldWeights);
+        }
+
+        // Apply sorting when requested
+        if (null !== $sortBy && isset($sortBy['mode']) && isset($sortBy['field'])) {
+            $sphinxClient->SetSortMode($sortBy['mode'], $sortBy['field']);
         }
 
         $result = $sphinxClient->query($query, $index);
