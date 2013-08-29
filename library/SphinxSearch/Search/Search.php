@@ -61,6 +61,9 @@ class Search implements ServiceLocatorAwareInterface
      * @param integer $limit
      * @param integer $offset
      *
+     * @param integer $resultCount Gets filled by reference providing the total
+     * result count
+     *
      * @return array like:
      * array(
      *     array(
@@ -80,12 +83,14 @@ class Search implements ServiceLocatorAwareInterface
      */
     public function search(
               $index,
-        array $filters      = null,
-        array $queries      = null,
-        array $fieldWeights = null,
-        array $sortBy       = null,
-              $limit        = 20,
-              $offset       = 0
+        array $filters           = null,
+        array $queries           = null,
+        array $fieldWeights      = null,
+        array $sortBy            = null,
+              $distinctAttribute = null,
+              $limit             = 20,
+              $offset            = 0,
+             &$resultCount       = 0
     ) {
         // Get the SphinxClient service
         $sphinxClient = $this->getSphinxClientService();
@@ -113,7 +118,8 @@ class Search implements ServiceLocatorAwareInterface
                     $sphinxClient->SetFilterRange(
                                   $filter['key'],
                         (integer) $filter['min'],
-                        (integer) $filter['max']
+                        (integer) $filter['max'],
+                                  (isset($filter['exclude']) && true === $filter['exclude'])
                     );
                 } else {
                     if (!isset($filter['values']) || !is_array($filter['values'])) {
@@ -121,35 +127,14 @@ class Search implements ServiceLocatorAwareInterface
                     }
                     $sphinxClient->SetFilter(
                         $filter['key'],
-                        $filter['values']
+                        $filter['values'],
+                        (isset($filter['exclude']) && true === $filter['exclude'])
                     );
                 }
             }
         }
         if (null !== $queries) {
-            foreach ($queries as $key => $queryInfo) {
-                // When the key is a string we have ourselves a group
-                if (is_string($key)) {
-                    $query .= '( ';
-                    $first = true;
-                    foreach ($queryInfo as $groupedQueryInfo) {
-                        $query .= (!$first ? ' |' : '') . PHP_EOL .
-                        "  @{$groupedQueryInfo['key']} " . (
-                            $groupedQueryInfo['strict'] ?
-                            /*'^' . */implode(' ', $groupedQueryInfo['values'])/* . '$'*/ :
-                            '*' . implode('* *', $groupedQueryInfo['values']) . '*'
-                        );
-                        $first = false;
-                    }
-                    $query .= PHP_EOL . ')' . PHP_EOL;
-                } else {
-                    $query .= "@{$queryInfo['key']} " . (
-                        $queryInfo['strict'] ?
-                        /*'^' . */implode(' ', $queryInfo['values'])/* . '$'*/ :
-                        '*' . implode('* *', $queryInfo['values']) . '*'
-                    ) . PHP_EOL;
-                }
-            }
+            $query = $this->buildQuery($queries);
         }
 
         if (null !== $fieldWeights) {
@@ -159,6 +144,26 @@ class Search implements ServiceLocatorAwareInterface
         // Apply sorting when requested
         if (null !== $sortBy && isset($sortBy['mode']) && isset($sortBy['field'])) {
             $sphinxClient->SetSortMode($sortBy['mode'], $sortBy['field']);
+        } else {
+            // apply default sorting by weight
+            $sphinxClient->SetSortMode(SPH_SORT_RELEVANCE);
+        }
+
+        // Apply grouping when requested
+        if (!empty($distinctAttribute)) {
+            $groupBySortString = '@weight DESC'; // Default order by weight desc when grouping
+            if (null !== $sortBy && isset($sortBy['mode']) && isset($sortBy['field'])) {
+                // When sorting has been specifically requested icw grouping...
+                $groupBySortString = $sortBy['field'] . ' ' . (
+                    $sortBy['mode'] == 1 ? 'DESC' : 'ASC'
+                );
+                // We only inject hackedyhack asc and desc because sortmode gets ignored...
+            }
+            $sphinxClient->SetGroupBy(
+                $distinctAttribute,
+                SPH_GROUPBY_ATTR,
+                $groupBySortString
+            );
         }
 
         $result = $sphinxClient->query($query, $index);
@@ -178,6 +183,51 @@ class Search implements ServiceLocatorAwareInterface
             return array();
         }
 
+        $resultCount = (
+            isset($result['total_found']) ?
+            (int)$result['total_found'] :
+            null
+        );
+
         return $result['matches'];
+    }
+
+    /**
+     * Builds the query for sphinx based on the array of queries.
+     *
+     * @param array   $queries
+     * @param boolean $or
+     * @param integer $indent
+     *
+     * @return string
+     */
+    private function buildQuery(array $queries, $or = true, $indent = 0)
+    {
+        $query = '';
+        $indent += 4;
+        $stepBack = $indent-4;
+        $first = true;
+        foreach ($queries as $key => $queryInfo) {
+            if (!$first) {
+                $query .= ($or ? ' | ' : '') . PHP_EOL;
+            }
+            if (is_string($key)) {
+                $query .= str_repeat(' ', $stepBack) . '( ';
+                $query .= PHP_EOL . $this->buildQuery(
+                    $queryInfo,
+                    substr($key, 0, 2) === 'or',
+                    $indent
+                );
+                $query .= PHP_EOL . str_repeat(' ', $stepBack) . ')';
+            } else {
+                $query .= str_repeat(' ', $stepBack) . "@{$queryInfo['key']} " . (
+                    $queryInfo['strict'] ?
+                    implode(' ', $queryInfo['values']) :
+                    '*' . implode('* *', $queryInfo['values']) . '*'
+                );
+            }
+            $first = false;
+        }
+        return $query;
     }
 }
