@@ -64,6 +64,8 @@ class Search implements ServiceLocatorAwareInterface
      * @param integer $resultCount Gets filled by reference providing the total
      * result count
      *
+     * @param integer $maxMatches
+     *
      * @return array like:
      * array(
      *     array(
@@ -90,7 +92,8 @@ class Search implements ServiceLocatorAwareInterface
               $distinctAttribute = null,
               $limit             = 20,
               $offset            = 0,
-             &$resultCount       = 0
+             &$resultCount       = 0,
+              $maxMatches        = 1000
     ) {
         // Get the SphinxClient service
         $sphinxClient = $this->getSphinxClientService();
@@ -101,7 +104,7 @@ class Search implements ServiceLocatorAwareInterface
         $sphinxClient->ResetOverrides();
 
         // Set limit and offset
-        $sphinxClient->SetLimits($offset, $limit);
+        $sphinxClient->SetLimits($offset, $limit, $maxMatches);
 
         // Set the query var to empty by default
         $query = '';
