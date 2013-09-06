@@ -93,7 +93,8 @@ class Search implements ServiceLocatorAwareInterface
               $limit             = 20,
               $offset            = 0,
              &$resultCount       = 0,
-              $maxMatches        = 1000
+             $maxMatches         = 1000,
+             $orMode             = true
     ) {
         // Get the SphinxClient service
         $sphinxClient = $this->getSphinxClientService();
@@ -137,7 +138,7 @@ class Search implements ServiceLocatorAwareInterface
             }
         }
         if (null !== $queries) {
-            $query = $this->buildQuery($queries);
+            $query = $this->buildQuery($queries, $orMode);
         }
 
         if (null !== $fieldWeights) {
