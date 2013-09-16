@@ -105,7 +105,7 @@ class Search implements ServiceLocatorAwareInterface
         $sphinxClient->ResetOverrides();
 
         // Set limit and offset
-        $sphinxClient->SetLimits($offset, $limit, $maxMatches);
+        $sphinxClient->SetLimits($offset, $limit, ($maxMatches+$offset));
 
         // Set the query var to empty by default
         $query = '';
