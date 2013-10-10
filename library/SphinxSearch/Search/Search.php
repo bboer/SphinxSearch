@@ -224,6 +224,10 @@ class Search implements ServiceLocatorAwareInterface
                 );
                 $query .= PHP_EOL . str_repeat(' ', $stepBack) . ')';
             } else {
+                foreach ($queryInfo['values'] as &$value) {
+                    $value = $this->escapeSphinxSql($value);
+                }
+
                 $query .= str_repeat(' ', $stepBack) . "@{$queryInfo['key']} " . (
                     $queryInfo['strict'] ?
                     implode(' ', $queryInfo['values']) :
@@ -234,4 +238,19 @@ class Search implements ServiceLocatorAwareInterface
         }
         return $query;
     }
+
+    /**
+     * Escape chars
+     *
+     * @param string $value
+     * @return string
+     */
+    private function escapeSphinxSql($value)
+    {
+        $from = array('/');
+        $to   = array('\/');
+
+        return str_replace($from, $to, $value);
+    }
+
 }
